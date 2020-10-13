@@ -52,12 +52,28 @@ Options:
 		return fmt.Errorf("invalid index: %s", err)
 	}
 
+	str, err := getOut(pkg, total, idx)
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Fprintln(outStream, str)
+	return err
+}
+
+func getOut(pkg string, total, idx int) (string, error) {
+	if total < 1 {
+		return "", fmt.Errorf("invalid total: %d", total)
+	}
+	if idx >= total {
+		return "", fmt.Errorf("index shoud be between 0 to total-1, but: %d (total:%d)", idx, total)
+	}
+
 	buf := &bytes.Buffer{}
 	c := exec.Command("go", "test", "-list", ".", pkg)
 	c.Stdout = buf
 	c.Stderr = os.Stderr
 	if err := c.Run(); err != nil {
-		return err
+		return "", err
 	}
 	var list []string
 	for _, v := range strings.Split(buf.String(), "\n") {
@@ -75,9 +91,12 @@ Options:
 	}
 	from := getOffset(idx)
 	to := getOffset(idx + 1)
+	s := list[from:to]
 
-	_, err = fmt.Fprintln(outStream, "^(?:"+strings.Join(list[from:to], "|")+")$")
-	return err
+	if len(s) == 0 {
+		return "0^", nil
+	}
+	return "^(?:" + strings.Join(list[from:to], "|") + ")$", nil
 }
 
 func printVersion(out io.Writer) error {
