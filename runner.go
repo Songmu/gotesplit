@@ -6,8 +6,9 @@ import (
 )
 
 var dispatch = map[string]runner{
-	"regexp": &cmdRegexp{},
-	"run":    &cmdRun{},
+	"regexp":   &cmdRegexp{},
+	"run":      &cmdRun{},
+	"circleci": &cmdCircleCI{},
 }
 
 type runner interface {
