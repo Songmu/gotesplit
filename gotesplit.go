@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"math"
 	"os"
 	"os/exec"
 	"sort"
@@ -51,37 +50,6 @@ Options:
 		return fmt.Errorf("unknown subcommand or option: %s", argv[0])
 	}
 	return rnr.run(ctx, argv[1:], outStream, errStream)
-}
-
-func getOut(pkgs []string, total, idx int) (string, error) {
-	if total < 1 {
-		return "", fmt.Errorf("invalid total: %d", total)
-	}
-	if idx >= total {
-		return "", fmt.Errorf("index shoud be between 0 to total-1, but: %d (total:%d)", idx, total)
-	}
-	testLists, err := getTestListsFromPkgs(pkgs)
-	if err != nil {
-		return "", err
-	}
-	var list []string
-	if len(testLists) > 0 {
-		list = testLists[0].list
-	}
-	testNum := len(list)
-	minMemberPerGroup := testNum / total
-	mod := testNum % total
-	getOffset := func(i int) int {
-		return minMemberPerGroup*i + int(math.Min(float64(i), float64(mod)))
-	}
-	from := getOffset(idx)
-	to := getOffset(idx + 1)
-	s := list[from:to]
-
-	if len(s) == 0 {
-		return "0^", nil
-	}
-	return "^(?:" + strings.Join(list[from:to], "|") + ")$", nil
 }
 
 func getTestListsFromPkgs(pkgs []string) ([]testList, error) {
