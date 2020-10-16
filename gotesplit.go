@@ -3,6 +3,7 @@ package gotesplit
 import (
 	"bytes"
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -11,7 +12,6 @@ import (
 	"os"
 	"os/exec"
 	"sort"
-	"strconv"
 	"strings"
 )
 
@@ -42,25 +42,18 @@ Options:
 		return printVersion(outStream)
 	}
 
-	pkg := argv[0]
-	total, err := strconv.Atoi(argv[1])
-	if err != nil {
-		return fmt.Errorf("invalid total: %s", err)
+	argv = fs.Args()
+	if len(argv) < 1 {
+		return errors.New("no subcommand specified")
 	}
-	idx, err := strconv.Atoi(argv[2])
-	if err != nil {
-		return fmt.Errorf("invalid index: %s", err)
+	rnr, ok := dispatch[argv[0]]
+	if !ok {
+		return fmt.Errorf("unknown subcommand or option: %s", argv[0])
 	}
-
-	str, err := getOut(pkg, total, idx)
-	if err != nil {
-		return err
-	}
-	_, err = fmt.Fprintln(outStream, str)
-	return err
+	return rnr.run(ctx, argv[1:], outStream, errStream)
 }
 
-func getOut(pkg string, total, idx int) (string, error) {
+func getOut(pkgs []string, total, idx int) (string, error) {
 	if total < 1 {
 		return "", fmt.Errorf("invalid total: %d", total)
 	}
@@ -68,8 +61,9 @@ func getOut(pkg string, total, idx int) (string, error) {
 		return "", fmt.Errorf("index shoud be between 0 to total-1, but: %d (total:%d)", idx, total)
 	}
 
+	args := append([]string{"test", "-list", "."}, pkgs...)
 	buf := &bytes.Buffer{}
-	c := exec.Command("go", "test", "-list", ".", pkg)
+	c := exec.Command("go", args...)
 	c.Stdout = buf
 	c.Stderr = os.Stderr
 	if err := c.Run(); err != nil {
