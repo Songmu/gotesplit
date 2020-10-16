@@ -60,23 +60,14 @@ func getOut(pkgs []string, total, idx int) (string, error) {
 	if idx >= total {
 		return "", fmt.Errorf("index shoud be between 0 to total-1, but: %d (total:%d)", idx, total)
 	}
-
-	args := append([]string{"test", "-list", "."}, pkgs...)
-	buf := &bytes.Buffer{}
-	c := exec.Command("go", args...)
-	c.Stdout = buf
-	c.Stderr = os.Stderr
-	if err := c.Run(); err != nil {
+	testLists, err := getTestListsFromPkgs(pkgs)
+	if err != nil {
 		return "", err
 	}
 	var list []string
-	for _, v := range strings.Split(buf.String(), "\n") {
-		if strings.HasPrefix(v, "Test") {
-			list = append(list, v)
-		}
+	if len(testLists) > 0 {
+		list = testLists[0].list
 	}
-	sort.Strings(list)
-
 	testNum := len(list)
 	minMemberPerGroup := testNum / total
 	mod := testNum % total
@@ -91,6 +82,50 @@ func getOut(pkgs []string, total, idx int) (string, error) {
 		return "0^", nil
 	}
 	return "^(?:" + strings.Join(list[from:to], "|") + ")$", nil
+}
+
+func getTestListsFromPkgs(pkgs []string) ([]testList, error) {
+	args := append([]string{"test", "-list", "."}, pkgs...)
+	buf := &bytes.Buffer{}
+	c := exec.Command("go", args...)
+	c.Stdout = buf
+	c.Stderr = os.Stderr
+	if err := c.Run(); err != nil {
+		return nil, err
+	}
+	return getTestLists(buf.String()), nil
+}
+
+type testList struct {
+	pkg  string
+	list []string
+}
+
+func getTestLists(out string) []testList {
+	var lists []testList
+	var list []string
+	for _, v := range strings.Split(out, "\n") {
+		if strings.HasPrefix(v, "Test") {
+			list = append(list, v)
+			continue
+		}
+		if strings.HasPrefix(v, "ok ") {
+			stuff := strings.Fields(v)
+			if len(stuff) != 3 {
+				continue
+			}
+			sort.Strings(list)
+			lists = append(lists, testList{
+				pkg:  stuff[1],
+				list: list,
+			})
+			list = nil
+		}
+	}
+	sort.Slice(lists, func(i, j int) bool {
+		return len(lists[i].list) < len(lists[j].list)
+	})
+	return lists
 }
 
 func printVersion(out io.Writer) error {
