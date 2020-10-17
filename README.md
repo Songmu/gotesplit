@@ -1,12 +1,12 @@
 gotesplit
 =======
 
-[![Test Status](https://github.com/Songmu/gotesplit/workflows/test/badge.svg?branch=master)][actions]
+[![Test Status](https://github.com/Songmu/gotesplit/workflows/test/badge.svg?branch=main)][actions]
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)][license]
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/Songmu/gotesplit)][PkgGoDev]
 
 [actions]: https://github.com/Songmu/gotesplit/actions?workflow=test
-[license]: https://github.com/Songmu/gotesplit/blob/master/LICENSE
+[license]: https://github.com/Songmu/gotesplit/blob/main/LICENSE
 [PkgGoDev]: https://pkg.go.dev/github.com/Songmu/gotesplit
 
 gotesplit splits the testng in Go into a subset and run it
@@ -28,13 +28,13 @@ It is very useful when you want to run tests in parallel in a CI environment.
 
 ```console
 # Install the latest version. (Install it into ./bin/ by default).
-% curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/master/install.sh | sh -s
+% curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/main/install.sh | sh -s
 
 # Specify installation directory ($(go env GOPATH)/bin/) and version.
-% curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/master/install.sh | sh -s -- -b $(go env GOPATH)/bin [vX.Y.Z]
+% curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/main/install.sh | sh -s -- -b $(go env GOPATH)/bin [vX.Y.Z]
 
 # In alpine linux (as it does not come with curl by default)
-% wget -O - -q https://raw.githubusercontent.com/Songmu/gotesplit/master/install.sh | sh -s [vX.Y.Z]
+% wget -O - -q https://raw.githubusercontent.com/Songmu/gotesplit/main/install.sh | sh -s [vX.Y.Z]
 
 # go get
 % go get github.com/Songmu/gotesplit/cmd/gotesplit
@@ -54,7 +54,7 @@ We don't need to specify the -total and -index flag on CircleCI because gotespli
       - checkout
       - run:
           command: |
-            curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/master/install.sh | sh -s
+            curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/main/install.sh | sh -s
             bin/gotesplit ./... -- -v
 ```
 
@@ -76,7 +76,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Run tests parallelly
         run: |
-          curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/master/install.sh | sh -s
+          curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/main/install.sh | sh -s
           bin/gotesplit -total ${{ matrix.parallelism }} -index ${{ matrix.index }} ./... -- -v
 ```
 

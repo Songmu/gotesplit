@@ -39,7 +39,7 @@ install:
 
 .PHONY: release
 release: devel-deps
-	godzil release
+	godzil release -branch=main
 
 CREDITS: deps devel-deps
 	godzil credits -w
