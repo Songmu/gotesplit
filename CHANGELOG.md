@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.0.4](https://github.com/Songmu/gotesplit/compare/v0.0.3...v0.0.4) (2020-10-17)
+
+* CGO_ENABLED=0 [#6](https://github.com/Songmu/gotesplit/pull/6) ([Songmu](https://github.com/Songmu))
+
 ## [v0.0.3](https://github.com/Songmu/gotesplit/compare/v0.0.2...v0.0.3) (2020-10-17)
 
 * support windows [#5](https://github.com/Songmu/gotesplit/pull/5) ([Songmu](https://github.com/Songmu))
