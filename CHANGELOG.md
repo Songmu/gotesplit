@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.0.3](https://github.com/Songmu/gotesplit/compare/v0.0.2...v0.0.3) (2020-10-17)
+
+* support windows [#5](https://github.com/Songmu/gotesplit/pull/5) ([Songmu](https://github.com/Songmu))
+
 ## [v0.0.2](https://github.com/Songmu/gotesplit/compare/v0.0.1...v0.0.2) (2020-10-17)
 
 * fix install.sh [#4](https://github.com/Songmu/gotesplit/pull/4) ([Songmu](https://github.com/Songmu))
