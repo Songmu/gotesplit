@@ -9,8 +9,7 @@ import (
 	"strings"
 )
 
-type cmdRegexp struct {
-}
+type cmdRegexp struct{}
 
 func (c *cmdRegexp) run(ctx context.Context, argv []string, outStream io.Writer, errStream io.Writer) error {
 	if len(argv) < 3 {

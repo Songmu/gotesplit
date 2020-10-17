@@ -6,30 +6,12 @@ import (
 	"io"
 	"math"
 	"os/exec"
-	"strconv"
 	"strings"
 )
 
-type cmdRun struct {
-}
-
-func (c *cmdRun) run(ctx context.Context, argv []string, outStream io.Writer, errStream io.Writer) error {
-	if len(argv) < 3 {
-		return fmt.Errorf("not enough arguments")
-	}
-	total, err := strconv.Atoi(argv[0])
-	if err != nil {
-		return fmt.Errorf("invalid total: %s", err)
-	}
-	idx, err := strconv.Atoi(argv[1])
-	if err != nil {
-		return fmt.Errorf("invalid index: %s", err)
-	}
-	if total < 1 {
-		return fmt.Errorf("invalid total: %d", total)
-	}
+func run(ctx context.Context, total, idx uint, argv []string, outStream io.Writer, errStream io.Writer) error {
 	if idx >= total {
-		return fmt.Errorf("index shoud be between 0 to total-1, but: %d (total:%d)", idx, total)
+		return fmt.Errorf("`index` should be the range from 0 to `total`-1, but: %d (total:%d)", idx, total)
 	}
 
 	l := len(argv)
@@ -37,7 +19,7 @@ func (c *cmdRun) run(ctx context.Context, argv []string, outStream io.Writer, er
 		pkgs     []string
 		testOpts []string
 	)
-	for i := 2; i < l; i++ {
+	for i := 0; i < l; i++ {
 		pkg := argv[i]
 		if pkg == "--" {
 			testOpts = argv[i+1:]
@@ -60,11 +42,11 @@ func (c *cmdRun) run(ctx context.Context, argv []string, outStream io.Writer, er
 			testListStrs = append(testListStrs, v.pkg+delim+t)
 		}
 	}
-	testNum := len(testListStrs)
+	testNum := uint(len(testListStrs))
 	minMemberPerGroup := testNum / total
 	mod := testNum % total
-	getOffset := func(i int) int {
-		return minMemberPerGroup*i + int(math.Min(float64(i), float64(mod)))
+	getOffset := func(i uint) uint {
+		return minMemberPerGroup*i + uint(math.Min(float64(i), float64(mod)))
 	}
 	from := getOffset(idx)
 	to := getOffset(idx + 1)

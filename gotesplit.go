@@ -3,7 +3,6 @@ package gotesplit
 import (
 	"bytes"
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -24,32 +23,39 @@ func Run(ctx context.Context, argv []string, outStream, errStream io.Writer) err
 	fs.SetOutput(errStream)
 	fs.Usage = func() {
 		fmt.Fprintf(fs.Output(), `Usage of %s:
+  $ gotesplit [options] [pkgs...] [-- go-test-arguments...]
 
-  $ %s $pkg $total $index
-  ^(?:TestAA|TestBB)$
-  $ go test $pkg -run $(%[2]s $pkg $total $index)
+Description:
+  split the testng in Go into a subset and run it
+
+Example:
+  $ gotesplit -total=10 -index=0 -- -v -short
+  go test -v -short -run ^(?:TestAA|TestBB)$
 
 Options:
-`, fs.Name(), cmdName)
+`, fs.Name())
 		fs.PrintDefaults()
 	}
-	ver := fs.Bool("version", false, "display version")
+	total := fs.Uint("total", 1, "total number of test splits (CIRCLE_NODE_TOTAL is used if set)")
+	index := fs.Uint("index", 0, "zero-based index number of test splits (CIRCLE_NODE_INDEX is used if set)")
+	fs.VisitAll(func(f *flag.Flag) {
+		if f.Name == "index" || f.Name == "total" {
+			if s := os.Getenv("CIRCLE_NODE_" + strings.ToUpper(f.Name)); s != "" {
+				f.Value.Set(s)
+			}
+		}
+	})
 	if err := fs.Parse(argv); err != nil {
 		return err
 	}
-	if *ver {
-		return printVersion(outStream)
-	}
-
 	argv = fs.Args()
-	if len(argv) < 1 {
-		return errors.New("no subcommand specified")
+	if len(argv) > 0 {
+		rnr, ok := dispatch[argv[0]]
+		if ok {
+			return rnr.run(ctx, argv[1:], outStream, errStream)
+		}
 	}
-	rnr, ok := dispatch[argv[0]]
-	if !ok {
-		return fmt.Errorf("unknown subcommand or option: %s", argv[0])
-	}
-	return rnr.run(ctx, argv[1:], outStream, errStream)
+	return run(ctx, *total, *index, argv, outStream, errStream)
 }
 
 func getTestListsFromPkgs(pkgs []string) ([]testList, error) {
@@ -73,7 +79,7 @@ func getTestLists(out string) []testList {
 	var lists []testList
 	var list []string
 	for _, v := range strings.Split(out, "\n") {
-		if strings.HasPrefix(v, "Test") {
+		if strings.HasPrefix(v, "Test") || strings.HasPrefix(v, "Example") {
 			list = append(list, v)
 			continue
 		}
@@ -91,12 +97,11 @@ func getTestLists(out string) []testList {
 		}
 	}
 	sort.Slice(lists, func(i, j int) bool {
-		return len(lists[i].list) < len(lists[j].list)
+		cmp := len(lists[i].list) - len(lists[j].list)
+		if cmp != 0 {
+			return cmp < 0
+		}
+		return strings.Compare(lists[i].pkg, lists[j].pkg) < 0
 	})
 	return lists
-}
-
-func printVersion(out io.Writer) error {
-	_, err := fmt.Fprintf(out, "%s v%s (rev:%s)\n", cmdName, version, revision)
-	return err
 }
