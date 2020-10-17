@@ -93,7 +93,7 @@ tag_to_version() {
   fi
   # if version starts with 'v', remove it
   TAG="$REALTAG"
-  VERSION=${TAG#v}
+  VERSION=${TAG}
 }
 adjust_format() {
   case ${OS} in
@@ -105,24 +105,10 @@ adjust_format() {
 }
 adjust_os() {
   # adjust archive name based on OS
-  case ${OS} in
-    386) OS=i386 ;;
-    amd64) OS=x86_64 ;;
-    darwin) OS=Darwin ;;
-    linux) OS=Linux ;;
-    windows) OS=Windows ;;
-  esac
   true
 }
 adjust_arch() {
   # adjust archive name based on ARCH
-  case ${ARCH} in
-    386) ARCH=i386 ;;
-    amd64) ARCH=x86_64 ;;
-    darwin) ARCH=Darwin ;;
-    linux) ARCH=Linux ;;
-    windows) ARCH=Windows ;;
-  esac
   true
 }
 
@@ -392,7 +378,7 @@ log_info "found version: ${VERSION} for ${TAG}/${OS}/${ARCH}"
 NAME=${PROJECT_NAME}_${VERSION}_${OS}_${ARCH}
 TARBALL=${NAME}.${FORMAT}
 TARBALL_URL=${GITHUB_DOWNLOAD}/${TAG}/${TARBALL}
-CHECKSUM=checksums.txt
+CHECKSUM=SHA256SUMS
 CHECKSUM_URL=${GITHUB_DOWNLOAD}/${TAG}/${CHECKSUM}
 
 
