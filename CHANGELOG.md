@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.0.5](https://github.com/Songmu/gotesplit/compare/v0.0.4...v0.0.5) (2020-10-17)
+
+* default to main branch [#8](https://github.com/Songmu/gotesplit/pull/8) ([Songmu](https://github.com/Songmu))
+* mv cmd_run.go run.go [#7](https://github.com/Songmu/gotesplit/pull/7) ([Songmu](https://github.com/Songmu))
+
 ## [v0.0.4](https://github.com/Songmu/gotesplit/compare/v0.0.3...v0.0.4) (2020-10-17)
 
 * CGO_ENABLED=0 [#6](https://github.com/Songmu/gotesplit/pull/6) ([Songmu](https://github.com/Songmu))
