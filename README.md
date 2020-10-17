@@ -56,8 +56,8 @@ We don't need to specify the -total and -index flag on CircleCI because gotespli
       - checkout
       - run:
           command: |
-            curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
-            gotesplit ./... -- -v -short -p=1
+            curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/master/install.sh | sh -s
+            bin/gotesplit ./... -- -v
 ```
 
 ### GitHub Actions
@@ -78,8 +78,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Run tests parallelly
         run: |
-          curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
-          gotesplit -total ${{ matrix.parallelism }} -index ${{ matrix.index }} ./... -- -v -short -p=1
+          curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/master/install.sh | sh -s
+          bin/gotesplit -total ${{ matrix.parallelism }} -index ${{ matrix.index }} ./... -- -v
 ```
 
 ## Author
