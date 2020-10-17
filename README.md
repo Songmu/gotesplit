@@ -60,7 +60,7 @@ We don't need to specify the -total and -index flag on CircleCI because gotespli
 
 ### GitHub Actions
 
-```
+```yaml
 name: CI
 on: [push, pull_request]
 jobs:
