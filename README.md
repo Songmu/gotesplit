@@ -11,7 +11,23 @@ gotesplit
 
 gotesplit splits the testng in Go into a subset and run it
 
-## Synopsis
+## Usage
+
+```console
+% gotesplit [options] [pkgs...] [-- go-test-arguments...]
+```
+
+
+### Options
+
+```
+-total uint
+      total number of test splits (CIRCLE_NODE_TOTAL is used if set) (default 1)
+-index uint
+      zero-based index number of test splits (CIRCLE_NODE_INDEX is used if set) (default 0)
+```
+
+### Synopsis
 
 ```console
 % gotesplit -total=10 -index=0 -- -v -short
