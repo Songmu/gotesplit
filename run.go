@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func run(ctx context.Context, total, idx uint, argv []string, outStream io.Writer, errStream io.Writer) error {
+func run(ctx context.Context, total, idx uint, junitfile string, argv []string, outStream io.Writer, errStream io.Writer) error {
 	if idx >= total {
 		return fmt.Errorf("`index` should be the range from 0 to `total`-1, but: %d (total:%d)", idx, total)
 	}
@@ -27,6 +27,21 @@ func run(ctx context.Context, total, idx uint, argv []string, outStream io.Write
 		}
 		pkgs = append(pkgs, pkg)
 	}
+	if junitfile != "" {
+		verbose := false
+		for _, opt := range testOpts {
+			if strings.HasSuffix(opt, "-v") {
+				verbose = true
+			}
+			if strings.HasSuffix(opt, "-json") {
+				return fmt.Errorf("-json output and -junitfile cannot be specified at the same time")
+			}
+		}
+		if !verbose {
+			testOpts = append([]string{"-v"}, testOpts...)
+		}
+	}
+
 	testLists, err := getTestListsFromPkgs(pkgs)
 	if err != nil {
 		return err
