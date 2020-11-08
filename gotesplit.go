@@ -38,7 +38,7 @@ Options:
 	}
 	total := fs.Uint("total", 1, "total number of test splits (CIRCLE_NODE_TOTAL is used if set)")
 	index := fs.Uint("index", 0, "zero-based index number of test splits (CIRCLE_NODE_INDEX is used if set)")
-	junitfile := fs.String("junitfile", "", "junit file")
+	junitDir := fs.String("junit-dir", "", "directory to store test result in JUnit format")
 	fs.VisitAll(func(f *flag.Flag) {
 		if f.Name == "index" || f.Name == "total" {
 			if s := os.Getenv("CIRCLE_NODE_" + strings.ToUpper(f.Name)); s != "" {
@@ -56,7 +56,7 @@ Options:
 			return rnr.run(ctx, argv[1:], outStream, errStream)
 		}
 	}
-	return run(ctx, *total, *index, *junitfile, argv, outStream, errStream)
+	return run(ctx, *total, *index, *junitDir, argv, outStream, errStream)
 }
 
 func getTestListsFromPkgs(pkgs []string) ([]testList, error) {
