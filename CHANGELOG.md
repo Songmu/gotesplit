@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.1.0](https://github.com/Songmu/gotesplit/compare/v0.0.5...v0.1.0) (2020-11-09)
+
+* implement -junit-dir option to store test resultJunit [#10](https://github.com/Songmu/gotesplit/pull/10) ([Songmu](https://github.com/Songmu))
+* udpate README [#9](https://github.com/Songmu/gotesplit/pull/9) ([Songmu](https://github.com/Songmu))
+
 ## [v0.0.5](https://github.com/Songmu/gotesplit/compare/v0.0.4...v0.0.5) (2020-10-17)
 
 * default to main branch [#8](https://github.com/Songmu/gotesplit/pull/8) ([Songmu](https://github.com/Songmu))
