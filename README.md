@@ -25,6 +25,8 @@ gotesplit splits the testng in Go into a subset and run it
       total number of test splits (CIRCLE_NODE_TOTAL is used if set) (default 1)
 -index uint
       zero-based index number of test splits (CIRCLE_NODE_INDEX is used if set) (default 0)
+-junit-dir
+       directory to store test result as a JUnit format (optional)
 ```
 
 ### Synopsis
