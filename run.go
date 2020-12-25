@@ -3,6 +3,7 @@ package gotesplit
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -203,11 +204,17 @@ func goTest(args []string, stdout, stderr io.Writer, junitDir string) *testRepor
 		eg.Go(func() error {
 			defer outCloser.Close()
 			_, err := io.Copy(stdout, outReader)
+			if err != nil && errors.Is(err, os.ErrClosed) {
+				err = nil
+			}
 			return err
 		})
 		eg.Go(func() error {
 			defer errCloser.Close()
 			_, err := io.Copy(stderr, errReader)
+			if err != nil && errors.Is(err, os.ErrClosed) {
+				err = nil
+			}
 			return err
 		})
 	}
