@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.1.1](https://github.com/Songmu/gotesplit/compare/v0.1.0...v0.1.1) (2020-12-25)
+
+* ignore os.ErrClosed [#12](https://github.com/Songmu/gotesplit/pull/12) ([Songmu](https://github.com/Songmu))
+
 ## [v0.1.0](https://github.com/Songmu/gotesplit/compare/v0.0.5...v0.1.0) (2020-11-09)
 
 * implement -junit-dir option to store test resultJunit [#10](https://github.com/Songmu/gotesplit/pull/10) ([Songmu](https://github.com/Songmu))
