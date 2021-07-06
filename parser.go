@@ -63,6 +63,9 @@ func (t Tests) Commands() []Command {
 
 		c.Tests = append(c.Tests, test.Name)
 	}
+	if c.Pkg != "" {
+		commands = append(commands, c)
+	}
 	return commands
 }
 
