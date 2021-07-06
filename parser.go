@@ -36,9 +36,12 @@ func (t Tests) DevideEquallyBy(parallel int) []Tests {
 	for i := 0; i < parallel; i++ {
 		start := i * div
 		end := (i + 1) * div
-		if i <= mod {
+		if i < mod {
 			start += i
 			end += i + 1
+		} else {
+			start += mod
+			end += mod
 		}
 		divided = append(divided, t[start:end])
 	}
