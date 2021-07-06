@@ -1,81 +1,40 @@
-gotesplit
+go-splittestgen
 =======
-
-[![Test Status](https://github.com/Songmu/gotesplit/workflows/test/badge.svg?branch=main)][actions]
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)][license]
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/Songmu/gotesplit)][PkgGoDev]
 
-[actions]: https://github.com/Songmu/gotesplit/actions?workflow=test
-[license]: https://github.com/Songmu/gotesplit/blob/main/LICENSE
-[PkgGoDev]: https://pkg.go.dev/github.com/Songmu/gotesplit
-
-gotesplit splits the testng in Go into a subset and run it
+go-splittestgen splits test cases into some subsets and print commands to run one of subsets for parallel testing.
+* The parser code is based on [github.com/Songmu/gotesplit](https://github.com/Songmu/gotesplit) written by [Songmu](https://github.com/Songmu)
 
 ## Usage
 
-```console
-% gotesplit [options] [pkgs...] [-- go-test-arguments...]
+```bash
+# print test commands
+$ go test ./... -list . | go-splittestgen
+
+# execute tests
+$ go test ./... -list . | go-splittestgen | sh
 ```
 
 
 ### Options
 
 ```
--total uint
-      total number of test splits (CIRCLE_NODE_TOTAL is used if set) (default 1)
--index uint
-      zero-based index number of test splits (CIRCLE_NODE_INDEX is used if set) (default 0)
--junit-dir
-       directory to store test result as a JUnit format (optional)
+  -index uint
+        index of parallel testing(default 0)
+  -total uint
+        process num of parallel testing (default 1)
 ```
-
-### Synopsis
-
-```console
-% gotesplit -total=10 -index=0 -- -v -short
-go test -v -short -run ^(?:TestAA|TestBB)$
-```
-
-## Description
-
-The gotesplit splits the testng in Go into a subset and run it.
-
-It is very useful when you want to run tests in parallel in a CI environment.
 
 ## Installation
 
-```console
-# Install the latest version. (Install it into ./bin/ by default).
-% curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/main/install.sh | sh -s
-
-# Specify installation directory ($(go env GOPATH)/bin/) and version.
-% curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/main/install.sh | sh -s -- -b $(go env GOPATH)/bin [vX.Y.Z]
-
-# In alpine linux (as it does not come with curl by default)
-% wget -O - -q https://raw.githubusercontent.com/Songmu/gotesplit/main/install.sh | sh -s [vX.Y.Z]
-
-# go get
-% go get github.com/Songmu/gotesplit/cmd/gotesplit
+```bash
+# go install
+$ go install github.com/minoritea/go-splittestgen/cmd/go-splittestgen
+# or just run
+$ go test ./... -list . | go run github.com/minoritea/go-splittestgen/cmd/go-splittestgen
 ```
 
 ## Example
-
-### CircleCI
-
-We don't need to specify the -total and -index flag on CircleCI because gotesplit reads the `CIRCLE_NODE_TOTAL` and `CIRCLE_NODE_INDEX` environment variables automatically.
-
-```yaml
-    parallelism: 5
-    docker:
-      - image: circleci/golang:1.15.3
-    steps:
-      - checkout
-      - run:
-          command: |
-            curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/main/install.sh | sh -s
-            bin/gotesplit ./... -- -v
-```
-
 ### GitHub Actions
 
 ```yaml
@@ -94,10 +53,13 @@ jobs:
       - uses: actions/checkout@v2
       - name: Run tests parallelly
         run: |
-          curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/main/install.sh | sh -s
-          bin/gotesplit -total ${{ matrix.parallelism }} -index ${{ matrix.index }} ./... -- -v
+          go test ./... -list . | \
+          go run github.com/minoritea/go-splittestgen/cmd/go-splittestgen -total ${{ matrix.parallelism }} -index ${{ matrix.index }} | \
+          sed -e 's/$/ -v -count 1/g' | sh
 ```
 
 ## Author
+[minoritea](https://github.com/minoritea)
 
+## Original Author
 [Songmu](https://github.com/Songmu)
