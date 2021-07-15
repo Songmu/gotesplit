@@ -104,7 +104,7 @@ func GetPackages(out string) Packages {
 	sort.Slice(packages, func(i, j int) bool {
 		cmp := len(packages[i].Tests) - len(packages[j].Tests)
 		if cmp != 0 {
-			return cmp < 0
+			return cmp > 0
 		}
 		return strings.Compare(packages[i].Name, packages[j].Name) < 0
 	})
