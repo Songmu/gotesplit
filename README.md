@@ -56,8 +56,9 @@ jobs:
       - name: Run tests parallelly
         run: |
           go test ./... -list . | \
-          go run github.com/minoritea/go-splittestgen/cmd/go-splittestgen | \
-            -total ${{ matrix.parallelism }} -index ${{ matrix.index }} | \
+          go run github.com/minoritea/go-splittestgen/cmd/go-splittestgen \
+            -total ${{ matrix.parallelism }} \
+            -index ${{ matrix.index }} | \
           sed -e 's/$/ -v -count 1/g' | sh
 ```
 
