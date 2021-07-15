@@ -51,10 +51,13 @@ jobs:
     steps:
       - uses: actions/setup-go@v2
       - uses: actions/checkout@v2
+      # Add github.com/minoritea/go-splittestgen to go.mod
+      # and install modules before tests.
       - name: Run tests parallelly
         run: |
           go test ./... -list . | \
-          go run github.com/minoritea/go-splittestgen/cmd/go-splittestgen -total ${{ matrix.parallelism }} -index ${{ matrix.index }} | \
+          go run github.com/minoritea/go-splittestgen/cmd/go-splittestgen | \
+            -total ${{ matrix.parallelism }} -index ${{ matrix.index }} | \
           sed -e 's/$/ -v -count 1/g' | sh
 ```
 
