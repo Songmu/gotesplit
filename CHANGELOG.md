@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.1.2](https://github.com/Songmu/gotesplit/compare/v0.1.1...v0.1.2) (2021-08-11)
+
+* update deps [#15](https://github.com/Songmu/gotesplit/pull/15) ([Songmu](https://github.com/Songmu))
+* Output stdout of the executed command to os.Stdout when failed. [#14](https://github.com/Songmu/gotesplit/pull/14) ([fujiwara](https://github.com/fujiwara))
+
 ## [v0.1.1](https://github.com/Songmu/gotesplit/compare/v0.1.0...v0.1.1) (2020-12-25)
 
 * ignore os.ErrClosed [#12](https://github.com/Songmu/gotesplit/pull/12) ([Songmu](https://github.com/Songmu))
