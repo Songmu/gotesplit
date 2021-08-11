@@ -66,6 +66,7 @@ func getTestListsFromPkgs(pkgs []string) ([]testList, error) {
 	c.Stdout = buf
 	c.Stderr = os.Stderr
 	if err := c.Run(); err != nil {
+		buf.WriteTo(os.Stdout)
 		return nil, err
 	}
 	return getTestLists(buf.String()), nil
