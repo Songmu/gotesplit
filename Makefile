@@ -12,14 +12,9 @@ deps:
 
 .PHONY: devel-deps
 devel-deps:
-	sh -c '\
-      tmpdir=$$(mktemp -d); \
-      cd $$tmpdir; \
-      go get ${u} \
-        golang.org/x/lint/golint            \
-        github.com/Songmu/godzil/cmd/godzil \
-        github.com/tcnksm/ghr; \
-      rm -rf $$tmpdir'
+	go install golang.org/x/lint/golint@latest
+	go install github.com/Songmu/godzil/cmd/godzil@latest
+	go install github.com/tcnksm/ghr@latest
 
 .PHONY: test
 test:
