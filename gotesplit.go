@@ -60,8 +60,12 @@ Options:
 	return run(ctx, *total, *index, *junitDir, argv, outStream, errStream)
 }
 
-func getTestListsFromPkgs(pkgs []string) ([]testList, error) {
-	args := append([]string{"test", "-list", "."}, pkgs...)
+func getTestListsFromPkgs(pkgs []string, tags string) ([]testList, error) {
+	args := []string{"test", "-list"}
+	if tags != "" {
+		args = append(args, tags)
+	}
+	args = append(append(args, "."), pkgs...)
 	buf := &bytes.Buffer{}
 	c := exec.Command("go", args...)
 	c.Stdout = buf

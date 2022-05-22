@@ -51,7 +51,7 @@ func run(ctx context.Context, total, idx uint, junitDir string, argv []string, o
 		}
 	}
 
-	testLists, err := getTestListsFromPkgs(pkgs)
+	testLists, err := getTestListsFromPkgs(pkgs, detectTags(argv))
 	if err != nil {
 		return err
 	}
