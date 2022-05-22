@@ -102,3 +102,24 @@ ok      github.com/x-motemen/ghq/logger 0.106s`
 		t.Errorf("expect: %#v\ngot: %#v", expect, got)
 	}
 }
+
+func TestDetectTags(t *testing.T) {
+	testCases := []struct {
+		input  []string
+		expect string
+	}{
+		{[]string{"aa", "bb"}, ""},
+		{[]string{"aa", "-tags", "bb"}, "-tags=bb"},
+		{[]string{"aa", "--tags=ccc", "bb"}, "--tags=ccc"},
+		{[]string{"aa", "-tags"}, "-tags"},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.expect, func(t *testing.T) {
+			out := detectTags(tc.input)
+			if out != tc.expect {
+				t.Errorf("got: %s, expect: %s", out, tc.expect)
+			}
+		})
+	}
+}

@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"regexp"
 	"sort"
 	"strings"
 )
@@ -59,8 +60,12 @@ Options:
 	return run(ctx, *total, *index, *junitDir, argv, outStream, errStream)
 }
 
-func getTestListsFromPkgs(pkgs []string) ([]testList, error) {
-	args := append([]string{"test", "-list", "."}, pkgs...)
+func getTestListsFromPkgs(pkgs []string, tags string) ([]testList, error) {
+	args := []string{"test", "-list"}
+	if tags != "" {
+		args = append(args, tags)
+	}
+	args = append(append(args, "."), pkgs...)
 	buf := &bytes.Buffer{}
 	c := exec.Command("go", args...)
 	c.Stdout = buf
@@ -70,6 +75,24 @@ func getTestListsFromPkgs(pkgs []string) ([]testList, error) {
 		return nil, err
 	}
 	return getTestLists(buf.String()), nil
+}
+
+var tagsReg = regexp.MustCompile(`^--?tags(=.*)?$`)
+
+func detectTags(argv []string) string {
+	l := len(argv)
+	for i := 0; i < l; i++ {
+		tags := argv[i]
+		m := tagsReg.FindStringSubmatch(tags)
+		if len(m) < 2 {
+			continue
+		}
+		if m[1] == "" && i+1 < l {
+			tags += "=" + argv[i+1]
+		}
+		return tags
+	}
+	return ""
 }
 
 type testList struct {

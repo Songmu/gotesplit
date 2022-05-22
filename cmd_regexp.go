@@ -12,6 +12,7 @@ import (
 type cmdRegexp struct{}
 
 func (c *cmdRegexp) run(ctx context.Context, argv []string, outStream io.Writer, errStream io.Writer) error {
+	// FIXME:
 	if len(argv) < 3 {
 		return fmt.Errorf("not enough arguments")
 	}
@@ -25,7 +26,7 @@ func (c *cmdRegexp) run(ctx context.Context, argv []string, outStream io.Writer,
 		return fmt.Errorf("invalid index: %s", err)
 	}
 
-	str, err := getOut(pkgs, total, idx)
+	str, err := getOut(pkgs, detectTags(argv), total, idx)
 	if err != nil {
 		return err
 	}
@@ -33,14 +34,14 @@ func (c *cmdRegexp) run(ctx context.Context, argv []string, outStream io.Writer,
 	return err
 }
 
-func getOut(pkgs []string, total, idx int) (string, error) {
+func getOut(pkgs []string, tags string, total, idx int) (string, error) {
 	if total < 1 {
 		return "", fmt.Errorf("invalid total: %d", total)
 	}
 	if idx >= total {
 		return "", fmt.Errorf("index shoud be between 0 to total-1, but: %d (total:%d)", idx, total)
 	}
-	testLists, err := getTestListsFromPkgs(pkgs)
+	testLists, err := getTestListsFromPkgs(pkgs, tags)
 	if err != nil {
 		return "", err
 	}
