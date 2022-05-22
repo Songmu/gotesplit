@@ -1,8 +1,8 @@
 module github.com/Songmu/gotesplit
 
-go 1.14
+go 1.18
 
 require (
-	github.com/jstemmer/go-junit-report v0.9.1
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+	github.com/jstemmer/go-junit-report v1.0.0
+	golang.org/x/sync v0.0.0-20220513210516-0976fa681c29
 )
