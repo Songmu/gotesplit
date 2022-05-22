@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"regexp"
 	"sort"
 	"strings"
 )
@@ -70,6 +71,24 @@ func getTestListsFromPkgs(pkgs []string) ([]testList, error) {
 		return nil, err
 	}
 	return getTestLists(buf.String()), nil
+}
+
+var tagsReg = regexp.MustCompile(`^--?tags(=.*)?$`)
+
+func detectTags(argv []string) string {
+	l := len(argv)
+	for i := 0; i < l; i++ {
+		tags := argv[i]
+		m := tagsReg.FindStringSubmatch(tags)
+		if len(m) < 2 {
+			continue
+		}
+		if m[1] == "" && i+1 < l {
+			tags += "=" + argv[i+1]
+		}
+		return tags
+	}
+	return ""
 }
 
 type testList struct {
