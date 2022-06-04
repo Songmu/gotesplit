@@ -61,11 +61,11 @@ Options:
 }
 
 func getTestListsFromPkgs(pkgs []string, tags string) ([]testList, error) {
-	args := []string{"test", "-list"}
+	args := []string{"test", "-list", "."}
 	if tags != "" {
 		args = append(args, tags)
 	}
-	args = append(append(args, "."), pkgs...)
+	args = append(args, pkgs...)
 	buf := &bytes.Buffer{}
 	c := exec.Command("go", args...)
 	c.Stdout = buf
