@@ -1,6 +1,7 @@
 package gotesplit
 
 import (
+	"os"
 	"reflect"
 	"testing"
 )
@@ -121,5 +122,29 @@ func TestDetectTags(t *testing.T) {
 				t.Errorf("got: %s, expect: %s", out, tc.expect)
 			}
 		})
+	}
+}
+
+func TestGetTestListFromPkgs(t *testing.T) {
+	if err := os.Chdir("testdata/withtags"); err != nil {
+		wd, _ := os.Getwd()
+		t.Fatalf("unexpected error: %v, cwd: %s", err, wd)
+	}
+
+	expect := []testList{{
+		pkg: "github.com/Songmu/gotesplit/testdata/withtags",
+		list: []string{
+			"TestNoTag",
+			"TestTagA",
+		},
+	}}
+
+	got, err := getTestListsFromPkgs([]string{"."}, "-tags=a")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if !reflect.DeepEqual(expect, got) {
+		t.Errorf("expect: %#v\ngot: %#v", expect, got)
 	}
 }
