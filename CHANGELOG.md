@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.2.1](https://github.com/Songmu/gotesplit/compare/v0.2.0...v0.2.1) (2022-06-09)
+
+* perf: tags option always placed at testOpts [#21](https://github.com/Songmu/gotesplit/pull/21) ([Warashi](https://github.com/Warashi))
+* fix: listing tests with tags [#20](https://github.com/Songmu/gotesplit/pull/20) ([Warashi](https://github.com/Warashi))
+
 ## [v0.2.0](https://github.com/Songmu/gotesplit/compare/v0.1.2...v0.2.0) (2022-05-22)
 
 * care -tags flag to list test cases [#19](https://github.com/Songmu/gotesplit/pull/19) ([Songmu](https://github.com/Songmu))
