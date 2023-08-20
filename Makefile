@@ -32,8 +32,8 @@ release: devel-deps
 CREDITS: deps devel-deps
 	godzil credits -w
 
-DIST_DIR = dist/v$(VERSION)
-.PHONY: crossbuild
+DIST_DIR = dist
+.PHONY: go.sum crossbuild
 crossbuild: CREDITS
 	rm -rf $(DIST_DIR)
 	env CGO_ENABLED=0 godzil crossbuild -pv=v$(VERSION) -build-ldflags=$(BUILD_LDFLAGS) \
@@ -42,4 +42,4 @@ crossbuild: CREDITS
 
 .PHONY: upload
 upload:
-	ghr -body="$$(godzil changelog --latest -F markdown)" v$(VERSION) dist/v$(VERSION)
+	ghr v$(VERSION) $(DIST_DIR)
