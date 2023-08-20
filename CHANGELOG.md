@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.3.0](https://github.com/Songmu/gotesplit/compare/v0.2.1...v0.3.0) - 2023-08-20
+- Use jstemmer/go-junit-report/v2 to correctly parse the output of go test by @shibayu36 in https://github.com/Songmu/gotesplit/pull/22
+- introduce tagpr GitHub Action by @Songmu in https://github.com/Songmu/gotesplit/pull/23
+- Go 1.21 and update deps by @Songmu in https://github.com/Songmu/gotesplit/pull/25
+
 ## [v0.2.1](https://github.com/Songmu/gotesplit/compare/v0.2.0...v0.2.1) (2022-06-09)
 
 * perf: tags option always placed at testOpts [#21](https://github.com/Songmu/gotesplit/pull/21) ([Warashi](https://github.com/Warashi))
