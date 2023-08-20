@@ -3,6 +3,7 @@ package gotesplit
 import (
 	"bytes"
 	"context"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"io"
@@ -13,8 +14,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/jstemmer/go-junit-report/formatter"
-	"github.com/jstemmer/go-junit-report/parser"
+	"github.com/jstemmer/go-junit-report/v2/gtr"
+	"github.com/jstemmer/go-junit-report/v2/junit"
+	parser "github.com/jstemmer/go-junit-report/v2/parser/gotest"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -138,7 +140,7 @@ func run(ctx context.Context, total, idx uint, junitDir string, argv []string, o
 					log.Printf("failed to open file to store test report: %s\n", err)
 				} else {
 					defer f.Close()
-					if err := formatter.JUnitReportXML(report.report.report, false, "", f); err != nil {
+					if err := writeJUnitReportXML(f, report.report.report); err != nil {
 						log.Printf("failed to store test report: %s\n", err)
 					}
 				}
@@ -149,7 +151,7 @@ func run(ctx context.Context, total, idx uint, junitDir string, argv []string, o
 }
 
 type junitReport struct {
-	report *parser.Report
+	report gtr.Report
 	err    error
 }
 
@@ -225,11 +227,29 @@ func goTest(args []string, stdout, stderr io.Writer, junitDir string) *testRepor
 		err: err,
 	}
 	if junitDir != "" {
-		report, err := parser.Parse(outBuf, "")
+		report, err := parser.NewParser().Parse(outBuf)
 		ret.report = &junitReport{
 			report: report,
 			err:    err,
 		}
 	}
 	return ret
+}
+
+func writeJUnitReportXML(w io.Writer, report gtr.Report) error {
+	testsuites := junit.CreateFromReport(report, "")
+	if _, err := fmt.Fprintf(w, xml.Header); err != nil {
+		return err
+	}
+
+	enc := xml.NewEncoder(w)
+	enc.Indent("", "\t")
+	if err := enc.Encode(testsuites); err != nil {
+		return err
+	}
+	if err := enc.Flush(); err != nil {
+		return err
+	}
+	_, err := fmt.Fprintf(w, "\n")
+	return err
 }
