@@ -236,6 +236,9 @@ func goTest(args []string, stdout, stderr io.Writer, junitDir string) *testRepor
 	return ret
 }
 
+// Copied and pasted from
+// https://github.com/jstemmer/go-junit-report/blob/v2.0.0/internal/gojunitreport/go-junit-report.go#L73-L93.
+// So the license of the following line follows the original one.
 func writeJUnitReportXML(w io.Writer, report gtr.Report) error {
 	testsuites := junit.CreateFromReport(report, "")
 	if _, err := fmt.Fprintf(w, xml.Header); err != nil {
