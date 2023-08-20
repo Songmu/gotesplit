@@ -90,8 +90,8 @@ jobs:
         parallelism: [3]
         index: [0,1,2]
     steps:
-      - uses: actions/setup-go@v2
-      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v4
+      - uses: actions/checkout@v3
       - name: Run tests parallelly
         run: |
           curl -sfL https://raw.githubusercontent.com/Songmu/gotesplit/main/install.sh | sh -s
