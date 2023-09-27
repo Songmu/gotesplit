@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.3.1](https://github.com/Songmu/gotesplit/compare/v0.3.0...v0.3.1) - 2023-09-27
+- Add -race to list when it is specified for test options by @shibayu36 in https://github.com/Songmu/gotesplit/pull/26
+
 ## [v0.3.0](https://github.com/Songmu/gotesplit/compare/v0.2.1...v0.3.0) - 2023-08-20
 - Use jstemmer/go-junit-report/v2 to correctly parse the output of go test by @shibayu36 in https://github.com/Songmu/gotesplit/pull/22
 - introduce tagpr GitHub Action by @Songmu in https://github.com/Songmu/gotesplit/pull/23
