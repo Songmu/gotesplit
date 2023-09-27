@@ -26,7 +26,7 @@ func (c *cmdRegexp) run(ctx context.Context, argv []string, outStream io.Writer,
 		return fmt.Errorf("invalid index: %s", err)
 	}
 
-	str, err := getOut(pkgs, detectTags(argv), total, idx)
+	str, err := getOut(pkgs, detectTags(argv), detectRace(argv), total, idx)
 	if err != nil {
 		return err
 	}
@@ -34,14 +34,14 @@ func (c *cmdRegexp) run(ctx context.Context, argv []string, outStream io.Writer,
 	return err
 }
 
-func getOut(pkgs []string, tags string, total, idx int) (string, error) {
+func getOut(pkgs []string, tags string, withRace bool, total, idx int) (string, error) {
 	if total < 1 {
 		return "", fmt.Errorf("invalid total: %d", total)
 	}
 	if idx >= total {
 		return "", fmt.Errorf("index shoud be between 0 to total-1, but: %d (total:%d)", idx, total)
 	}
-	testLists, err := getTestListsFromPkgs(pkgs, tags)
+	testLists, err := getTestListsFromPkgs(pkgs, tags, withRace)
 	if err != nil {
 		return "", err
 	}
