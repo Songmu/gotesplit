@@ -125,6 +125,29 @@ func TestDetectTags(t *testing.T) {
 	}
 }
 
+func TestDetectRace(t *testing.T) {
+	testCases := []struct {
+		input  []string
+		expect bool
+		desc   string
+	}{
+		{[]string{"-race"}, true, "-race only"},
+		{[]string{"-tags", "aaa", "-race", "-bench"}, true, "-race with other flags"},
+		{[]string{"--race", "-p", "1"}, true, "--race with other flags"},
+		{[]string{}, false, "no flags"},
+		{[]string{"-short", "-p", "1"}, false, "flags without -race"},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			out := detectRace(tc.input)
+			if out != tc.expect {
+				t.Errorf("got: %t, expect: %t", out, tc.expect)
+			}
+		})
+	}
+}
+
 func TestGetTestListFromPkgs(t *testing.T) {
 	if err := os.Chdir("testdata/withtags"); err != nil {
 		wd, _ := os.Getwd()
@@ -139,7 +162,7 @@ func TestGetTestListFromPkgs(t *testing.T) {
 		},
 	}}
 
-	got, err := getTestListsFromPkgs([]string{"."}, "-tags=a")
+	got, err := getTestListsFromPkgs([]string{"."}, "-tags=a", false)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

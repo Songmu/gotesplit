@@ -60,10 +60,15 @@ Options:
 	return run(ctx, *total, *index, *junitDir, argv, outStream, errStream)
 }
 
-func getTestListsFromPkgs(pkgs []string, tags string) ([]testList, error) {
+func getTestListsFromPkgs(pkgs []string, tags string, withRace bool) ([]testList, error) {
 	args := []string{"test", "-list", "."}
 	if tags != "" {
 		args = append(args, tags)
+	}
+	if withRace {
+		// If -race is specified for test options, add -race to list
+		// to prevent compilation from being executed twice.
+		args = append(args, "-race")
 	}
 	args = append(args, pkgs...)
 	buf := &bytes.Buffer{}
@@ -93,6 +98,16 @@ func detectTags(argv []string) string {
 		return tags
 	}
 	return ""
+}
+
+func detectRace(argv []string) bool {
+	l := len(argv)
+	for i := 0; i < l; i++ {
+		if argv[i] == "-race" || argv[i] == "--race" {
+			return true
+		}
+	}
+	return false
 }
 
 type testList struct {
