@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/jstemmer/go-junit-report/v2/gtr"
@@ -20,7 +21,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func run(ctx context.Context, total, idx uint, junitDir string, argv []string, outStream io.Writer, errStream io.Writer) error {
+func run(_ context.Context, total, idx uint, junitDir string, coverageDir string, argv []string, outStream io.Writer, errStream io.Writer) error {
 	if idx >= total {
 		return fmt.Errorf("`index` should be the range from 0 to `total`-1, but: %d (total:%d)", idx, total)
 	}
@@ -111,6 +112,25 @@ func run(ctx context.Context, total, idx uint, junitDir string, argv []string, o
 		}
 	}
 
+	coverprofileOut := ""
+	for i := range testOpts {
+		if strings.HasPrefix(testOpts[i], "-coverprofile=") {
+			coverprofileOut = strings.TrimPrefix(testOpts[i], "-coverprofile=")
+
+			if i == len(testOpts)-1 {
+				testOpts = testOpts[:i]
+			} else {
+				testOpts = append(testOpts[:i], testOpts[i+1:]...)
+			}
+			break
+		}
+	}
+	if coverprofileOut != "" {
+		if err := os.MkdirAll(coverageDir, 0755); err != nil {
+			return err
+		}
+	}
+
 	var testArgsList [][]string
 
 	if len(allPkgs) > 0 {
@@ -126,6 +146,10 @@ func run(ctx context.Context, total, idx uint, junitDir string, argv []string, o
 	}
 
 	for i, args := range testArgsList {
+		if coverprofileOut != "" {
+			args = append(args, fmt.Sprintf("-coverprofile=%s/coverprofile_%d", coverageDir, i))
+		}
+
 		report := goTest(args, outStream, errStream, junitDir)
 		if err2 := report.err; err2 != nil {
 			err = err2
@@ -147,7 +171,46 @@ func run(ctx context.Context, total, idx uint, junitDir string, argv []string, o
 			}
 		}
 	}
-	return err
+	if err != nil {
+		return err
+	}
+
+	if coverprofileOut != "" {
+		err = mergeCoverprofiles(coverageDir, coverprofileOut)
+		if err != nil {
+			return err
+		}
+
+		err = os.RemoveAll(coverageDir)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func mergeCoverprofiles(dir string, coverprofileOut string) error {
+	files, err := os.ReadDir(dir)
+	if err != nil {
+		return err
+	}
+
+	modeRegex := regexp.MustCompile(`^mode: [a-zA-Z]+\n`)
+	mergedContent := []byte{}
+	for i, file := range files {
+		content, err := os.ReadFile(dir + "/" + file.Name())
+		if err != nil {
+			return fmt.Errorf("failed to read file %s: %w", file.Name(), err)
+		}
+
+		if i != 0 {
+			content = modeRegex.ReplaceAll(content, []byte{})
+		}
+		mergedContent = append(mergedContent, content...)
+	}
+
+	return os.WriteFile(coverprofileOut, mergedContent, 0755)
 }
 
 type junitReport struct {
