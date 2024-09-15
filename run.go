@@ -21,7 +21,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func run(_ context.Context, total, idx uint, junitDir string, coverageDir string, argv []string, outStream io.Writer, errStream io.Writer) error {
+func run(_ context.Context, total, idx uint, junitDir string, coverprofilesDir string, argv []string, outStream io.Writer, errStream io.Writer) error {
 	if idx >= total {
 		return fmt.Errorf("`index` should be the range from 0 to `total`-1, but: %d (total:%d)", idx, total)
 	}
@@ -112,10 +112,12 @@ func run(_ context.Context, total, idx uint, junitDir string, coverageDir string
 		}
 	}
 
-	coverprofileOut := ""
+	// Check if coverprofile flag is set. If so remove it from args and replace it
+	// later with separate coverprofile files for each `go test` run.
+	coverprofileFile := ""
 	for i := range testOpts {
 		if strings.HasPrefix(testOpts[i], "-coverprofile=") {
-			coverprofileOut = strings.TrimPrefix(testOpts[i], "-coverprofile=")
+			coverprofileFile = strings.TrimPrefix(testOpts[i], "-coverprofile=")
 
 			if i == len(testOpts)-1 {
 				testOpts = testOpts[:i]
@@ -125,8 +127,9 @@ func run(_ context.Context, total, idx uint, junitDir string, coverageDir string
 			break
 		}
 	}
-	if coverprofileOut != "" {
-		if err := os.MkdirAll(coverageDir, 0755); err != nil {
+	if coverprofileFile != "" {
+		// Make temporary directory to store single coverprofile files in.
+		if err := os.MkdirAll(coverprofilesDir, 0755); err != nil {
 			return err
 		}
 	}
@@ -146,8 +149,9 @@ func run(_ context.Context, total, idx uint, junitDir string, coverageDir string
 	}
 
 	for i, args := range testArgsList {
-		if coverprofileOut != "" {
-			args = append(args, fmt.Sprintf("-coverprofile=%s/coverprofile_%d", coverageDir, i))
+		if coverprofileFile != "" {
+			// Write coverprofiles to temp folder.
+			args = append(args, fmt.Sprintf("-coverprofile=%s/coverprofile_%d", coverprofilesDir, i))
 		}
 
 		report := goTest(args, outStream, errStream, junitDir)
@@ -175,13 +179,15 @@ func run(_ context.Context, total, idx uint, junitDir string, coverageDir string
 		return err
 	}
 
-	if coverprofileOut != "" {
-		err = mergeCoverprofiles(coverageDir, coverprofileOut)
+	if coverprofileFile != "" {
+		// Merge single coverprofiles to one file.
+		err = mergeCoverprofiles(coverprofilesDir, coverprofileFile)
 		if err != nil {
 			return err
 		}
 
-		err = os.RemoveAll(coverageDir)
+		// Remove temp directory.
+		err = os.RemoveAll(coverprofilesDir)
 		if err != nil {
 			return err
 		}
@@ -205,6 +211,8 @@ func mergeCoverprofiles(dir string, coverprofileOut string) error {
 		}
 
 		if i != 0 {
+			// Cover mode is set in first line, remove it from all the following
+			// files.
 			content = modeRegex.ReplaceAll(content, []byte{})
 		}
 		mergedContent = append(mergedContent, content...)
