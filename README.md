@@ -56,6 +56,9 @@ It is very useful when you want to run tests in parallel in a CI environment.
 
 # go get
 % go get github.com/Songmu/gotesplit/cmd/gotesplit
+
+# aqua https://aquaproj.github.io/
+% aqua g -i Songmu/gotesplit
 ```
 
 ## Example
