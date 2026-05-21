@@ -11,12 +11,15 @@ runs:
   using: composite
   steps:
   - name: setup go
-    uses: actions/setup-go@v4
+    uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
     with:
       go-version-file: go.mod
-  - name: release
-    run: |
-      make crossbuild upload
+  - name: crossbuild
+    run: make crossbuild
     shell: bash
-    env:
-      GITHUB_TOKEN: ${{ inputs.token }}
+  - name: upload
+    uses: tcnksm/ghr@766f869eacbbb086e8860cf0f0192dda6e8e67e1 # v0.18.3
+    with:
+      tag: ${{ inputs.tag || github.ref_name }}
+      path: dist
+      token: ${{ inputs.token }}
