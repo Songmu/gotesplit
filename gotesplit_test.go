@@ -1,7 +1,6 @@
 package gotesplit
 
 import (
-	"os"
 	"reflect"
 	"testing"
 )
@@ -149,10 +148,7 @@ func TestDetectRace(t *testing.T) {
 }
 
 func TestGetTestListFromPkgs(t *testing.T) {
-	if err := os.Chdir("testdata/withtags"); err != nil {
-		wd, _ := os.Getwd()
-		t.Fatalf("unexpected error: %v, cwd: %s", err, wd)
-	}
+	chdirT(t, "testdata/withtags")
 
 	expect := []testList{{
 		pkg: "github.com/Songmu/gotesplit/testdata/withtags",
@@ -171,3 +167,4 @@ func TestGetTestListFromPkgs(t *testing.T) {
 		t.Errorf("expect: %#v\ngot: %#v", expect, got)
 	}
 }
+
